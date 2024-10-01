@@ -1,6 +1,6 @@
 package com.example.Multi_Tenant_Task_Management_System.controller;
 
-import com.example.Multi_Tenant_Task_Management_System.Tenant;
+import com.example.Multi_Tenant_Task_Management_System.entity.Tenant;
 
 import com.example.Multi_Tenant_Task_Management_System.dto.TenantDto;
 import com.example.Multi_Tenant_Task_Management_System.services.TenantService;

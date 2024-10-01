@@ -1,4 +1,4 @@
-package com.example.Multi_Tenant_Task_Management_System;
+package com.example.Multi_Tenant_Task_Management_System.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
