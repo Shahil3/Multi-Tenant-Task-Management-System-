@@ -1,6 +1,7 @@
 package com.example.Multi_Tenant_Task_Management_System.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,6 +29,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;  // Role field to differentiate between user roles (e.g., 'Admin', 'Manager', etc.)
+
     private enum Role {
         SuperAdmin, TenantAdmin, Manager, Employee
     }
@@ -39,7 +41,8 @@ public class User {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public User() {}
+    public User() {
+    }
 
     public User(Tenant tenant, String username, String email, String password, String role) {
         this.tenant = tenant;
