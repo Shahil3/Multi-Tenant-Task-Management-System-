@@ -1,12 +1,17 @@
 package com.example.Multi_Tenant_Task_Management_System.config;
 
+import com.example.Multi_Tenant_Task_Management_System.services.MyUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 
@@ -14,33 +19,30 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final MyUserDetailsService userDetailsService;
+
+    @Autowired
+    public SecurityConfig(MyUserDetailsService service){
+        this.userDetailsService = service;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll() // Allow access to the login page
-                        .requestMatchers("/").permitAll() // Allow access to the root path
-                        .anyRequest().authenticated()
-
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")// Configure form login
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true") // Redirect to the login page with error parameter
-                        .permitAll()
-                );
-
-
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
+//        http.formLogin(Customizer.withDefaults());
+        http.httpBasic(Customizer.withDefaults());
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("superAdmin").password("{noop}password").roles("SuperAdmin").build(),
-                User.withUsername("tenantAdmin").password("{noop}password").roles("TenantAdmin").build(),
-                User.withUsername("manager").password("{noop}password").roles("Manager").build(),
-                User.withUsername("employee").password("{noop}password").roles("Employee").build()
-        );
+    public AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setUserDetailsService(userDetailsService);
+        return provider;
     }
 }
+
+

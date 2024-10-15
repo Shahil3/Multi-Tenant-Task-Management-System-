@@ -3,7 +3,9 @@ package com.example.Multi_Tenant_Task_Management_System.controller;
 import com.example.Multi_Tenant_Task_Management_System.entity.Tenant;
 import com.example.Multi_Tenant_Task_Management_System.dto.TenantDto;
 import com.example.Multi_Tenant_Task_Management_System.services.TenantService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +22,13 @@ public class TenantController {
     }
 
     @GetMapping("/")
-    public String Greet() {
-        return "Hello!!!";
+    public String Greet(HttpServletRequest request) {
+        return "Hello!!!" +"\n" + "Session Id : " + request.getSession().getId();
+    }
+
+    @GetMapping("/csrf-token")
+    public CsrfToken getCsrf(HttpServletRequest request){
+        return (CsrfToken) request.getAttribute("_csrf");
     }
 
     @PostMapping("/tenants")

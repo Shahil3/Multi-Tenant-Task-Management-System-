@@ -1,7 +1,6 @@
 package com.example.Multi_Tenant_Task_Management_System.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,7 +13,7 @@ public class User {
     private Integer userId;  // Use Integer for user_id as it's auto-generated.
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "tenant_id", nullable = false)  // Foreign key to the tenants table.
+    @JoinColumn(name = "tenant_id")  // Foreign key to the tenants table.(dont forget to add nullable = false)
     private Tenant tenant;  // Link the Users entity to the Tenant entity.
 
     @Column(name = "username", nullable = false, unique = true, length = 50)
@@ -34,6 +33,19 @@ public class User {
         SuperAdmin, TenantAdmin, Manager, Employee
     }
 
+    // Fields with default values set to true.
+    @Column(name = "isAccountNonExpired", nullable = false)
+    private Boolean isAccountNonExpired = true;
+
+    @Column(name = "isAccountNonLocked", nullable = false)
+    private Boolean isAccountNonLocked = true;
+
+    @Column(name = "isCredentialsNonExpired", nullable = false)
+    private Boolean isCredentialsNonExpired = true;
+
+    @Column(name = "isEnabled", nullable = false)
+    private Boolean isEnabled = true;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -42,6 +54,8 @@ public class User {
 
     // Constructors
     public User() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public User(Tenant tenant, String username, String email, String password, String role) {
@@ -107,6 +121,38 @@ public class User {
         }
     }
 
+    public Boolean getAccountNonExpired() {
+        return isAccountNonExpired;
+    }
+
+    public void setAccountNonExpired(Boolean accountNonExpired) {
+        isAccountNonExpired = accountNonExpired;
+    }
+
+    public Boolean getAccountNonLocked() {
+        return isAccountNonLocked;
+    }
+
+    public void setAccountNonLocked(Boolean accountNonLocked) {
+        isAccountNonLocked = accountNonLocked;
+    }
+
+    public Boolean getCredentialsNonExpired() {
+        return isCredentialsNonExpired;
+    }
+
+    public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+        isCredentialsNonExpired = credentialsNonExpired;
+    }
+
+    public Boolean getEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -123,15 +169,24 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    // Utility method to check if user is active
+    public boolean isActive() {
+        return isAccountNonExpired && isAccountNonLocked && isCredentialsNonExpired && isEnabled;
+    }
+
     // Override toString() for better readability
     @Override
     public String toString() {
-        return "Users{" +
+        return "User{" +
                 "userId=" + userId +
                 ", tenant=" + tenant.getName() +  // Display tenant name instead of full object
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", role='" + role + '\'' +
+                ", isAccountNonExpired=" + isAccountNonExpired +
+                ", isAccountNonLocked=" + isAccountNonLocked +
+                ", isCredentialsNonExpired=" + isCredentialsNonExpired +
+                ", isEnabled=" + isEnabled +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User,Integer> {
     public List<User> findByTenant(Tenant tenant);
+    public User findByUsername(String userName);
 }
