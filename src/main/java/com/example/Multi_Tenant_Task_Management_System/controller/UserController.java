@@ -1,5 +1,6 @@
 package com.example.Multi_Tenant_Task_Management_System.controller;
 
+import com.example.Multi_Tenant_Task_Management_System.dto.UserDto;
 import com.example.Multi_Tenant_Task_Management_System.entity.User;
 import com.example.Multi_Tenant_Task_Management_System.services.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public void registerUser(String username, String email, String password, String role, Integer tenantId) {
-        userManagementService.registerUser(username, email, password, role, tenantId);
+    public void registerUser(@RequestBody UserDto userDto) {
+        userManagementService.registerUser(userDto);
     }
 
     @GetMapping("/users/{user_id}")

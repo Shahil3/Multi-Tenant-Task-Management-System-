@@ -1,5 +1,6 @@
 package com.example.Multi_Tenant_Task_Management_System.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -12,8 +13,9 @@ public class User {
     @Column(name = "user_id")  // Primary Key column in the database.
     private Integer userId;  // Use Integer for user_id as it's auto-generated.
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "tenant_id")  // Foreign key to the tenants table.(dont forget to add nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id",nullable = false)  // Foreign key to the tenants table.
+    @JsonIgnore
     private Tenant tenant;  // Link the Users entity to the Tenant entity.
 
     @Column(name = "username", nullable = false, unique = true, length = 50)
@@ -79,6 +81,14 @@ public class User {
 
     public Tenant getTenant() {
         return tenant;
+    }
+
+    public Integer getTenantId() {
+        return tenant != null ? tenant.getTenantId() : null;
+    }
+
+    public String getTenantName() {
+        return tenant != null ? tenant.getName() : null;
     }
 
     public void setTenant(Tenant tenant) {

@@ -25,7 +25,10 @@ public class Tenant {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public Tenant() {}
+    public Tenant() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public Tenant(String name, String description) {
         this.name = name;

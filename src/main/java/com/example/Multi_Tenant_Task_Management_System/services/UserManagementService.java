@@ -1,5 +1,6 @@
 package com.example.Multi_Tenant_Task_Management_System.services;
 
+import com.example.Multi_Tenant_Task_Management_System.dto.UserDto;
 import com.example.Multi_Tenant_Task_Management_System.entity.User;
 import com.example.Multi_Tenant_Task_Management_System.entity.Tenant;
 import com.example.Multi_Tenant_Task_Management_System.repository.UserRepository;
@@ -7,6 +8,7 @@ import com.example.Multi_Tenant_Task_Management_System.repository.TenantReposito
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,8 @@ public class UserManagementService {
 
     private final TenantRepository tenantRepository;
 
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
     @Autowired
     public UserManagementService(UserRepository userRepo, TenantRepository tenantRepo) {
         this.tenantRepository = tenantRepo;
@@ -27,13 +31,16 @@ public class UserManagementService {
 
     // Register new user and assign to a tenant
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin') and @userManagementService.isUserAuthorized(#tenantId)")
-    public void registerUser(String username, String email, String password, String role, Integer tenantId) {
-        Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
+    public void registerUser(UserDto userDto) {
+        if (userDto.tenantId() == null) {
+            throw new IllegalArgumentException("Tenant ID must not be null");
+        }
+        Optional<Tenant> tenantOptional = tenantRepository.findById(userDto.tenantId());
         if (tenantOptional.isEmpty()) {
             throw new IllegalArgumentException("Invalid tenant ID");
         }
         Tenant tenant = tenantOptional.get();
-        User user = new User(tenant, username, email, password, role);
+        User user = new User(tenant, userDto.username(), userDto.email(), encoder.encode(userDto.password()), userDto.role());
         userRepository.save(user);
     }
 
@@ -59,7 +66,7 @@ public class UserManagementService {
         User user = userOptional.get();
         user.setUsername(username);
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(encoder.encode(password));
         return userRepository.save(user);
     }
 
@@ -80,7 +87,7 @@ public class UserManagementService {
     }
 
     // View all users globally (for Super Admin)
-    @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin') and @userManagementService.isUserAuthorized(#tenantId)")
+    @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -102,4 +109,6 @@ public class UserManagementService {
             throw new EntityNotFoundException("User with id " + id + " is not present");
         }
     }
+
+
 }
