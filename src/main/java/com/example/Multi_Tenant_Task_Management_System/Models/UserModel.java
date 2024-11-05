@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.swing.text.Style;
 import java.util.*;
 import java.util.List;
 
@@ -15,9 +16,12 @@ public class UserModel implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(user.getRole()));
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_"+user.getRole()));
     }
 
+    public Integer get_tenant_id(){
+        return user.getTenantId();
+    }
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -36,6 +40,9 @@ public class UserModel implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         return user.getAccountNonLocked();
+    }
+    public void setAccountNonLocked(boolean status){
+        user.setAccountNonLocked(status);
     }
 
     @Override

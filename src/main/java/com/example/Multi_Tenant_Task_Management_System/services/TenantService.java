@@ -61,4 +61,14 @@ public class TenantService {
     public void deleteTenant(Integer id) {
         tenantRepo.deleteById(id);
     }
+    @PreAuthorize("hasRole('SuperAdmin')")
+    public String inactivateTenant(Integer tenantId) {
+        Optional<Tenant> tenant = tenantRepo.findById(tenantId);
+        if(tenant.isPresent()){
+            tenant.get().setActive(false);
+        }else{
+            return "No Tenant with id : " + tenantId + " exists!!!";
+        }
+        return "done";
+    }
 }

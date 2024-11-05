@@ -45,4 +45,8 @@ public class TenantController {
     public Tenant GetTenant(@PathVariable Integer tenant_id) {
         return tenantService.getTenant(tenant_id);
     }
+    @PostMapping("/inactivate/tenants/{tenant_id}")
+    public String inactivate_tenant(@PathVariable Integer tenant_id){
+        return tenantService.inactivateTenant(tenant_id);
+    }
 }

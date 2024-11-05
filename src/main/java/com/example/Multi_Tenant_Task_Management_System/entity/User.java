@@ -124,10 +124,12 @@ public class User {
     }
 
     public void setRole(String role) {
+//        System.out.println(role);
         try {
+
             this.role = Role.valueOf(role);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid role specified. Allowed values are: SuperAdmin, TenantAdmin, Manager, Employee.");
+            throw new IllegalArgumentException("Invalid role specified. Allowed values are: SuperAdmin, TenantAdmin, Manager, Employee." + "but given role is : "+role);
         }
     }
 

@@ -12,9 +12,7 @@ public class Comment {
     @Column(name = "comment_id")
     private Integer commentId;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_id", nullable = false)
-    private Task task;  // Comment belongs to a task
+
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,8 +30,7 @@ public class Comment {
     // Constructors
     public Comment() {}
 
-    public Comment(Task task, User user, String content) {
-        this.task = task;
+    public Comment(User user, String content) {
         this.user = user;
         this.content = content;
         this.createdAt = LocalDateTime.now();
@@ -49,13 +46,9 @@ public class Comment {
         this.commentId = commentId;
     }
 
-    public Task getTask() {
-        return task;
-    }
 
-    public void setTask(Task task) {
-        this.task = task;
-    }
+
+
 
     public User getUser() {
         return user;

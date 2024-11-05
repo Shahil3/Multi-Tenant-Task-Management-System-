@@ -18,6 +18,9 @@ public class Tenant {
     @Column(name = "description", length = 1000) // Description is optional with a max length of 1000.
     private String description;
 
+    @Column(name = "isActive",nullable = false)
+    private boolean isActive;
+
     @Column(name = "created_at", nullable = false, updatable = false) // Set created_at once during insert.
     private LocalDateTime createdAt;
 
@@ -28,6 +31,7 @@ public class Tenant {
     public Tenant() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.isActive = false;
     }
 
     public Tenant(String name, String description) {
@@ -35,6 +39,7 @@ public class Tenant {
         this.description = description;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.isActive = true;
     }
 
     // Getters and Setters
@@ -76,5 +81,13 @@ public class Tenant {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void setActive(boolean status){
+        this.isActive = status;
+    }
+
+    public boolean getIsActive(){
+        return isActive;
     }
 }
