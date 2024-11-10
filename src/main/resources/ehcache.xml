@@ -1,0 +1,7 @@
+<ehcache>
+    <cache name="tenants" maxEntriesLocalHeap="1000" timeToLiveSeconds="300" />
+    <cache name="users" maxEntriesLocalHeap="1000" timeToLiveSeconds="300" />
+    <cache name="projects" maxEntriesLocalHeap="1000" timeToLiveSeconds="300" />
+    <cache name="notifications" maxEntriesLocalHeap="1000" timeToLiveSeconds="300" />
+    <cache name="comments" maxEntriesLocalHeap="1000" timeToLiveSeconds="300" />
+</ehcache>

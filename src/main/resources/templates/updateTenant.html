@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Tenant</title>
+</head>
+<body>
+<h1>Update Tenant</h1>
+
+<form th:action="@{/tenants/{id}/update(id=${tenant_id})}" th:object="${tenant}" method="post">
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" th:field="*{name}" required />
+    </div>
+    <div>
+        <label for="description">Description:</label>
+        <input type="text" id="description" th:field="*{description}" />
+    </div>
+    <button type="submit">Update Tenant</button>
+</form>
+
+<a href="/tenants">Back to Tenants</a>
+</body>
+</html>

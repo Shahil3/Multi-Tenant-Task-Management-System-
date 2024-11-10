@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<h1>Welcome, <span th:text="${role}"></span>!</h1>
+<p>Here are your available options:</p>
+
+<h2>Tenant Management</h2>
+<ul>
+    <!-- Viewing Options -->
+    <li><a th:href="@{/tenants}">View All Tenants</a></li>
+
+    <!-- Action Options -->
+    <li><a th:href="@{/tenants/new}">Create New Tenant</a></li>
+
+    <li><a th:href="@{/tenants/{id}(id=1)}">View Tenant Details</a> <!-- Example link with a placeholder ID, replace `id=1` with actual IDs dynamically if needed --></li>
+
+    <li><a th:href="@{/tenants/{id}/update(id=1)}">Update Tenant</a></li>
+    <li><a th:href="@{/tenants/delete(id=1)}">Delete Tenant</a></li>
+    <li><a th:href="@{/tenants/inactivate(id=1)}">Inactivate Tenant</a></li>
+</ul>
+
+<h2>User Management</h2>
+<!-- Add similar user management links here if needed -->
+</body>
+</html>

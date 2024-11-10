@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
+  <link rel="stylesheet" th:href="@{/styles.css}"> <!-- Ensure this path is correct -->
 </head>
 <body>
-<h1>Login Page</h1>
-
-<!-- Display error message if login fails -->
-<div th:if="${error}" style="color:red;">[[${error}]]</div>
-<!-- Display logout message if applicable -->
-<div th:if="${message}" style="color:green;">[[${message}]]</div>
-
-<form action="/login" method="post" th:action="@{/login}" th:object="${user}">
-  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-
-  <label for="username">Username:</label>
-  <input type="text" id="username" name="username" required />
-  <br/>
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password" required />
-  <br/>
-  <button type="submit">Login</button>
-</form>
+<div class="login-container">
+  <h2>Login</h2>
+  <form th:action="@{/login}" method="post">
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <div>
+      <button type="submit">Login</button>
+    </div>
+    <div th:if="${param.error}">
+      <p class="error">Invalid username or password.</p>
+    </div>
+    <div th:if="${param.logout}">
+      <p class="success">You have been logged out.</p>
+    </div>
+  </form>
+</div>
 </body>
 </html>
