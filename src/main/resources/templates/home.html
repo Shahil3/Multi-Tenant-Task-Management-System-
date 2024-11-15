@@ -14,15 +14,24 @@
 
     <!-- Action Options -->
     <li><a th:href="@{/tenants/new}">Create New Tenant</a></li>
-
     <li><a th:href="@{/tenants/{id}(id=1)}">View Tenant Details</a> <!-- Example link with a placeholder ID, replace `id=1` with actual IDs dynamically if needed --></li>
-
     <li><a th:href="@{/tenants/{id}/update(id=1)}">Update Tenant</a></li>
     <li><a th:href="@{/tenants/delete(id=1)}">Delete Tenant</a></li>
     <li><a th:href="@{/tenants/inactivate(id=1)}">Inactivate Tenant</a></li>
 </ul>
 
 <h2>User Management</h2>
-<!-- Add similar user management links here if needed -->
+<ul>
+    <!-- Viewing Options -->
+    <li><a th:href="@{/users}">View All Users</a></li>
+
+    <!-- Action Options -->
+    <li><a th:href="@{/users/new}">Register New User</a></li>
+    <li><a th:href="@{/users/{user_id}(user_id=1)}">View User Details</a> <!-- Example link with a placeholder user_id, replace `user_id=1` with actual IDs dynamically if needed --></li>
+    <li><a th:href="@{/users/{user_id}(user_id=1)}">Update User</a></li>
+    <li><a th:href="@{/users/delete}">Delete User</a></li>
+<!--    <li><a th:href="@{/users/inactivate(user_id=1)}">Inactivate User</a></li>-->
+</ul>
+
 </body>
 </html>

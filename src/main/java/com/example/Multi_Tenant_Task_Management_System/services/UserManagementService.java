@@ -72,18 +72,19 @@ public class UserManagementService {
         long startTime = System.currentTimeMillis();
 
         Integer tenant_id = userModel.get_tenant_id();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
         Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
         boolean valid = authorities.stream().anyMatch(authority ->
                 authority.getAuthority().equals("ROLE_SuperAdmin") ||
-                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, userId))
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, user.getTenantId()))
         );
 
         if (!valid) {
             throw new Exception("Illegal action! You are not authorized to perform this action.");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
+
 
         long executionTime = System.currentTimeMillis() - startTime;
         return new ResponseWithTime<>(user, executionTime);
@@ -138,9 +139,27 @@ public class UserManagementService {
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
     @CacheEvict(value = "users", key = "#userId")
     @Transactional
-    public ResponseWithTime<String> deleteUser(Integer userId) {
+    public ResponseWithTime<String> deleteUser(Integer userId, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
 
+        // Retrieve the user to be deleted
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
+
+        Integer tenantId = userModel.get_tenant_id();
+        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
+
+        // Validate if the user has permission to delete
+        boolean valid = authorities.stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_SuperAdmin") ||
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenantId, user.getTenant().getTenantId()))
+        );
+
+        if (!valid) {
+            throw new Exception("Illegal action! You are not authorized to perform this action.");
+        }
+
+        // Delete the user if authorized
         userRepository.deleteById(userId);
 
         long executionTime = System.currentTimeMillis() - startTime;
@@ -154,17 +173,18 @@ public class UserManagementService {
         long startTime = System.currentTimeMillis();
 
         Integer tenant_id = userModel.get_tenant_id();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
         Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
         boolean valid = authorities.stream().anyMatch(authority ->
                 authority.getAuthority().equals("ROLE_SuperAdmin") ||
-                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, userId))
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, user.getTenantId()))
         );
 
         if (!valid) {
             throw new Exception("Illegal action! You are not authorized to perform this action.");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
         user.setAccountNonLocked(false); // Assuming this is a field in User to indicate inactivation
         userRepository.save(user);
 
@@ -175,9 +195,27 @@ public class UserManagementService {
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
     @CacheEvict(value = "users", key = "#userId")
     @Transactional
-    public ResponseWithTime<String> deleteUserById(Integer userId) {
+    public ResponseWithTime<String> deleteUserById(Integer userId, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
 
+        // Fetch the user to be deleted and check if they exist
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
+
+        Integer tenant_id = userModel.get_tenant_id();
+        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
+
+        // Check if the current user has permission to delete
+        boolean valid = authorities.stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_SuperAdmin") ||
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, user.getTenant().getTenantId()))
+        );
+
+        if (!valid) {
+            throw new Exception("Illegal action! You are not authorized to perform this action.");
+        }
+
+        // Delete the user
         userRepository.deleteById(userId);
 
         long executionTime = System.currentTimeMillis() - startTime;

@@ -22,6 +22,8 @@ public class HomeController {
 
         boolean isSuperAdmin = authorities.stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_SuperAdmin"));
+        boolean isTenantAdmin = authorities.stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_TenantAdmin"));
 
         if (isSuperAdmin) {
             model.addAttribute("role", "SuperAdmin");
@@ -35,6 +37,18 @@ public class HomeController {
             actionLinks.add("/tenants/{id}/update");  // Update tenant
             actionLinks.add("/tenants/delete");  // Delete tenant
             actionLinks.add("/tenants/{id}/inactivate");  // Inactivate tenant
+        }
+
+        if (isTenantAdmin) {
+            model.addAttribute("role", "TenantAdmin");
+
+            // Viewing Links for TenantAdmin
+            viewLinks.add("/tenants/{id}");  // View own tenant details
+            viewLinks.add("/users");
+            // Action Links for TenantAdmin
+            actionLinks.add("/tenants/{id}/update");  // Update own tenant details
+            actionLinks.add("/tasks");  // View tasks (assuming a TenantAdmin might manage tasks)
+            actionLinks.add("/tasks/new");  // Create new tasks for their own tenant
         }
 
         model.addAttribute("viewLinks", viewLinks);

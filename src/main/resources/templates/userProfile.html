@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Profile</title>
+</head>
+<body>
+<h1>User Profile</h1>
+
+<!-- Display User Information -->
+<div th:if="${user != null}">
+    <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Role:</strong> <span th:text="${user.role}"></span></p>
+</div>
+<div th:if="${user == null}">
+    <p>User data is not available.</p>
+</div>
+
+<h2>Update Profile</h2>
+
+<!-- Update Form -->
+<form th:if="${user != null}" th:action="@{/users/{userId}/update(userId=${user.getUserId()})}" method="post">
+    <div>
+        <label for="username">New Username:</label>
+        <input type="text" id="username" name="username" th:value="${user.username}" required />
+    </div>
+    <div>
+        <label for="email">New Email:</label>
+        <input type="email" id="email" name="email" th:value="${user.email}" required />
+    </div>
+    <div>
+        <label for="password">New Password:</label>
+        <input type="password" id="password" name="password" required />
+    </div>
+    <button type="submit">Update Profile</button>
+</form>
+
+<!-- Display Execution Time -->
+<p th:if="${executionTime != null}"><strong>Execution Time:</strong> <span th:text="${executionTime}"></span> ms</p>
+
+<a href="/users">Back to Users List</a>
+</body>
+</html>

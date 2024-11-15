@@ -5,14 +5,17 @@ import com.example.Multi_Tenant_Task_Management_System.dto.TenantDto;
 import com.example.Multi_Tenant_Task_Management_System.entity.Tenant;
 import com.example.Multi_Tenant_Task_Management_System.services.TenantService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.example.Multi_Tenant_Task_Management_System.Models.UserModel;
+import org.springframework.security.core.GrantedAuthority;
 
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/tenants")
@@ -66,12 +69,33 @@ public class TenantController {
     // Display form to update a specific tenant by ID
     @GetMapping("/{tenant_id}/update")
     @PreAuthorize("hasRole('SuperAdmin')")
-    public String getTenantForUpdate(@PathVariable("tenant_id") Integer tenantId, Model model) {
+    public String getTenantForUpdate(@PathVariable("tenant_id") Integer tenantId, Model model, Authentication authentication) throws Exception {
+        // Retrieve the currently authenticated user
+        UserModel currentUser = (UserModel) authentication.getPrincipal();
+
+        // Check if the user is authorized to update this tenant
+        Collection<? extends GrantedAuthority> authorities = currentUser.getAuthorities();
+        Integer userTenantId = currentUser.get_tenant_id();
+
+        boolean isAuthorized = authorities.stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_SuperAdmin") ||
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(userTenantId, tenantId))
+        );
+
+        // If the user is not authorized, throw an exception or handle it as needed
+        if (!isAuthorized) {
+            throw new Exception("Unauthorized access! You are not authorized to update this tenant.");
+        }
+
+        // Fetch the tenant data if authorized
         Tenant tenant = tenantService.getTenant(tenantId).getData();
         TenantDto tenantDto = TenantDto.fromTenant(tenant); // Convert to TenantDto without ID
-        model.addAttribute("tenant", tenantDto);            // Add tenant data (without ID)
-        model.addAttribute("tenant_id", tenantId);          // Pass tenant ID separately
-        return "updateTenant";                              // Render updateTenant form
+
+        // Add tenant data to the model
+        model.addAttribute("tenant", tenantDto);  // Add tenant data (without ID)
+        model.addAttribute("tenant_id", tenantId);  // Pass tenant ID separately
+
+        return "updateTenant";  // Render updateTenant form
     }
 
     // Handle form submission to update a tenant
