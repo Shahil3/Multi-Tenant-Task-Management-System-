@@ -3,6 +3,7 @@ package com.example.Multi_Tenant_Task_Management_System.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")  // Maps the class to the 'users' table.
@@ -54,6 +55,7 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+
     // Constructors
     public User() {
         this.createdAt = LocalDateTime.now();
@@ -69,6 +71,9 @@ public class User {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
+
+
 
     // Getters and Setters
     public Integer getUserId() {

@@ -24,6 +24,10 @@ public class HomeController {
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_SuperAdmin"));
         boolean isTenantAdmin = authorities.stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_TenantAdmin"));
+        boolean isManager = authorities.stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_Manager"));
+        boolean isEmployee = authorities.stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_Employee"));
 
         if (isSuperAdmin) {
             model.addAttribute("role", "SuperAdmin");
@@ -44,11 +48,29 @@ public class HomeController {
 
             // Viewing Links for TenantAdmin
             viewLinks.add("/tenants/{id}");  // View own tenant details
-            viewLinks.add("/users");
+            viewLinks.add("/users");  // View users
+
             // Action Links for TenantAdmin
             actionLinks.add("/tenants/{id}/update");  // Update own tenant details
-            actionLinks.add("/tasks");  // View tasks (assuming a TenantAdmin might manage tasks)
+            actionLinks.add("/tasks");  // View tasks
             actionLinks.add("/tasks/new");  // Create new tasks for their own tenant
+        }
+
+        // Common section for Manager and Employee roles
+        if (isManager || isEmployee) {
+            model.addAttribute("role", isManager ? "Manager" : "Employee");
+
+            // Viewing Links for Manager and Employee
+            viewLinks.add("/projects");  // View assigned projects
+            viewLinks.add("/notifications");  // View notifications
+            viewLinks.add("/comments");  // View comments
+
+            if (isManager) {
+                // Action Links for Manager
+                actionLinks.add("/projects/assign/new");  // Assign project to an employee
+                actionLinks.add("/notifications/new");  // Add a notification for an employee
+                actionLinks.add("/comments/new");  // Add a comment for an employee
+            }
         }
 
         model.addAttribute("viewLinks", viewLinks);

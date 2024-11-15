@@ -3,6 +3,7 @@ package com.example.Multi_Tenant_Task_Management_System.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Entity
@@ -29,6 +30,14 @@ public class Project {
         Active, Inactive, Completed
     }
 
+    @ManyToMany
+    @JoinTable(
+            name = "project_employee",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> assignedEmployees = new ArrayList<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -38,13 +47,21 @@ public class Project {
 //    Constructor
     public Project(){}
 
-    public Project(Tenant tenant, String name, String description, String status){
+    public Project(Tenant tenant, String name, String description, String status) {
         this.tenant = tenant;
         this.name = name;
         this.description = description;
-        setStatus(status);
+        setStatus(status); // Use the setter to validate and set the status
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+
+    // Method to add an employee to the project
+    public void assignEmployee(User employee) {
+        if (!assignedEmployees.contains(employee)) {
+            assignedEmployees.add(employee);
+        }
     }
 
 
@@ -86,10 +103,14 @@ public class Project {
     }
 
     public void setStatus(String status) {
-        try {
-            this.status = State.valueOf(status);
-        } catch (IllegalArgumentException exp) {
-            System.out.println("Incorrect status");
+        if (status != null) {
+            try {
+                this.status = State.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid project status: " + status);
+            }
+        } else {
+            throw new IllegalArgumentException("Status cannot be null");
         }
     }
 
@@ -108,4 +129,7 @@ public class Project {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+
 }
+

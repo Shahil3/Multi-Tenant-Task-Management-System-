@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employees of Project</title>
+</head>
+<body>
+<h1>Employees Assigned to Project ID: <span th:text="${projectId}"></span></h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Employee ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="employee : ${employees}">
+        <td th:text="${employee.userId}">1</td>
+        <td th:text="${employee.username}">Username</td>
+        <td th:text="${employee.email}">Email</td>
+        <td th:text="${employee.role}">Role</td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/projects">Back to Projects</a>
+</body>
+</html>
