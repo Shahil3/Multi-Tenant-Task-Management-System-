@@ -2,6 +2,9 @@
 
 A scalable and efficient task management solution designed for multi-tenant environments. This application allows multiple tenants (organizations or user groups) to manage tasks, assign roless, projects, and streamline workflows with a secure and intuitive interface.
 
+
+Modern shared infrastructure systems require efficient solutions for data integrity, secure isolation, and resource optimization. This project addresses these challenges in a multi-tenant environment by using **transaction management**, **data security practices**, and **optimized resource utilization** to provide a robust solution.
+
 ##  Features
 
 - **Transactional Integrity (ACID Compliance)**:
@@ -17,13 +20,7 @@ A scalable and efficient task management solution designed for multi-tenant envi
 - **Audit and Compliance**:
   - Captures tenant-specific logs for monitoring, governance, and security compliance.
 
----
 
-## 📝 Problem Statement
-
-Modern shared infrastructure systems require efficient solutions for data integrity, secure isolation, and resource optimization. This project addresses these challenges in a multi-tenant environment by using **transaction management**, **data security practices**, and **optimized resource utilization** to provide a robust solution.
-
----
 
 ## Methods Adopted
 
