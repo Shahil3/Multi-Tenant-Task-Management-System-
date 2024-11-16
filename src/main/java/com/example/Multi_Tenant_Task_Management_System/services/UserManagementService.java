@@ -41,29 +41,25 @@ public class UserManagementService {
     @Transactional
     public ResponseWithTime<String> registerUser(UserDto userDto, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
-
         validateUserAccess(userDto, userModel);
 
-        Optional<Tenant> tenantOptional = tenantRepository.findById(userDto.tenantId());
-        Tenant tenant = tenantOptional.orElseThrow(() -> new IllegalArgumentException("Invalid tenant ID"));
+        Tenant tenant = tenantRepository.findById(userDto.tenantId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid tenant ID"));
+
         User user = new User(tenant, userDto.username(), userDto.email(), encoder.encode(userDto.password()), userDto.role());
         userRepository.save(user);
 
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>("User registered successfully", executionTime);
+        return new ResponseWithTime<>("User registered successfully", System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
     @Cacheable(value = "users", key = "#tenantId")
     public ResponseWithTime<List<User>> getUsersByTenant(Integer tenantId) {
         long startTime = System.currentTimeMillis();
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid tenant ID"));
 
-        Optional<Tenant> tenantOptional = tenantRepository.findById(tenantId);
-        Tenant tenant = tenantOptional.orElseThrow(() -> new IllegalArgumentException("Invalid tenant ID"));
-        List<User> users = userRepository.findByTenant(tenant);
-
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>(users, executionTime);
+        return new ResponseWithTime<>(userRepository.findByTenant(tenant), System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
@@ -71,37 +67,25 @@ public class UserManagementService {
     public ResponseWithTime<User> getUserById(Integer userId, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        Integer tenant_id = userModel.get_tenant_id();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
-        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
-        boolean valid = authorities.stream().anyMatch(authority ->
-                authority.getAuthority().equals("ROLE_SuperAdmin") ||
-                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, user.getTenantId()))
-        );
 
-        if (!valid) {
-            throw new Exception("Illegal action! You are not authorized to perform this action.");
-        }
+        validateActionAuthorization(user, userModel);
 
-
-
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>(user, executionTime);
+        return new ResponseWithTime<>(user, System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
     @Cacheable(value = "users")
     public ResponseWithTime<List<User>> getAllUsers(UserModel user) throws Exception {
         long startTime = System.currentTimeMillis();
-
         Integer tenantId = user.get_tenant_id();
+
         List<User> users = (tenantId == 1) ? userRepository.findAll() : userRepository.findByTenant(
                 tenantRepository.findById(tenantId).orElseThrow(() -> new Exception("No such tenant present"))
         );
 
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>(users, executionTime);
+        return new ResponseWithTime<>(users, System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
@@ -109,14 +93,13 @@ public class UserManagementService {
     @Transactional
     public ResponseWithTime<User> updateUserRole(Integer userId, String role) {
         long startTime = System.currentTimeMillis();
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         user.setRole(role);
         userRepository.save(user);
 
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>(user, executionTime);
+        return new ResponseWithTime<>(user, System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
@@ -124,46 +107,29 @@ public class UserManagementService {
     @Transactional
     public ResponseWithTime<User> updateUserProfile(Integer userId, String username, String email, String password) {
         long startTime = System.currentTimeMillis();
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encoder.encode(password));
         userRepository.save(user);
 
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>(user, executionTime);
+        return new ResponseWithTime<>(user, System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
-    @CacheEvict(value = "users", key = "#userId")
+    @CacheEvict(value = "users", allEntries = true)  // Evict all users from cache after deletion
     @Transactional
     public ResponseWithTime<String> deleteUser(Integer userId, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
-
-        // Retrieve the user to be deleted
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
 
-        Integer tenantId = userModel.get_tenant_id();
-        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
+        validateActionAuthorization(user, userModel);
 
-        // Validate if the user has permission to delete
-        boolean valid = authorities.stream().anyMatch(authority ->
-                authority.getAuthority().equals("ROLE_SuperAdmin") ||
-                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenantId, user.getTenant().getTenantId()))
-        );
-
-        if (!valid) {
-            throw new Exception("Illegal action! You are not authorized to perform this action.");
-        }
-
-        // Delete the user if authorized
         userRepository.deleteById(userId);
-
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>("User deleted successfully", executionTime);
+        return new ResponseWithTime<>("User deleted successfully", System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
@@ -171,25 +137,15 @@ public class UserManagementService {
     @Transactional
     public ResponseWithTime<String> inactivateUser(Integer userId, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
-
-        Integer tenant_id = userModel.get_tenant_id();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
-        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
-        boolean valid = authorities.stream().anyMatch(authority ->
-                authority.getAuthority().equals("ROLE_SuperAdmin") ||
-                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, user.getTenantId()))
-        );
 
-        if (!valid) {
-            throw new Exception("Illegal action! You are not authorized to perform this action.");
-        }
+        validateActionAuthorization(user, userModel);
 
-        user.setAccountNonLocked(false); // Assuming this is a field in User to indicate inactivation
+        user.setAccountNonLocked(false);
         userRepository.save(user);
 
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>("User inactivated successfully", executionTime);
+        return new ResponseWithTime<>("User inactivated successfully", System.currentTimeMillis() - startTime);
     }
 
     @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
@@ -197,32 +153,15 @@ public class UserManagementService {
     @Transactional
     public ResponseWithTime<String> deleteUserById(Integer userId, UserModel userModel) throws Exception {
         long startTime = System.currentTimeMillis();
-
-        // Fetch the user to be deleted and check if they exist
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not present"));
 
-        Integer tenant_id = userModel.get_tenant_id();
-        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
+        validateActionAuthorization(user, userModel);
 
-        // Check if the current user has permission to delete
-        boolean valid = authorities.stream().anyMatch(authority ->
-                authority.getAuthority().equals("ROLE_SuperAdmin") ||
-                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenant_id, user.getTenant().getTenantId()))
-        );
-
-        if (!valid) {
-            throw new Exception("Illegal action! You are not authorized to perform this action.");
-        }
-
-        // Delete the user
         userRepository.deleteById(userId);
-
-        long executionTime = System.currentTimeMillis() - startTime;
-        return new ResponseWithTime<>("User deleted successfully", executionTime);
+        return new ResponseWithTime<>("User deleted successfully", System.currentTimeMillis() - startTime);
     }
 
-    // Additional utility method to validate access
     private void validateUserAccess(UserDto userDto, UserModel userModel) throws Exception {
         Integer tenantId = userModel.get_tenant_id();
         Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
@@ -230,6 +169,17 @@ public class UserManagementService {
                 authority.getAuthority().equals("ROLE_SuperAdmin") ||
                         (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenantId, userDto.tenantId()))
         );
+        if (!valid) throw new Exception("Illegal action! You are not authorized to perform this action.");
+    }
+
+    private void validateActionAuthorization(User user, UserModel userModel) throws Exception {
+        Integer tenantId = userModel.get_tenant_id();
+        Collection<? extends GrantedAuthority> authorities = userModel.getAuthorities();
+        boolean valid = authorities.stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_SuperAdmin") ||
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(tenantId, user.getTenantId()))
+        );
+
         if (!valid) throw new Exception("Illegal action! You are not authorized to perform this action.");
     }
 }

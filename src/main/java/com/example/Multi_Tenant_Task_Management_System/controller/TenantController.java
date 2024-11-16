@@ -62,7 +62,26 @@ public class TenantController {
     // Endpoint to retrieve a specific tenant by ID (JSON response)
     @GetMapping("/{tenant_id}")
     @ResponseBody
-    public ResponseWithTime<Tenant> getTenant(@PathVariable("tenant_id") Integer tenantId) {
+    @PreAuthorize("hasAnyRole('SuperAdmin', 'TenantAdmin')")
+    public ResponseWithTime<Tenant> getTenant(@PathVariable("tenant_id") Integer tenantId, Authentication authentication) throws Exception {
+        // Retrieve the currently authenticated user
+        UserModel currentUser = (UserModel) authentication.getPrincipal();
+
+        // Check if the user is authorized to view this tenant
+        Collection<? extends GrantedAuthority> authorities = currentUser.getAuthorities();
+        Integer userTenantId = currentUser.get_tenant_id();
+
+        boolean isAuthorized = authorities.stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_SuperAdmin") ||
+                        (authority.getAuthority().equals("ROLE_TenantAdmin") && Objects.equals(userTenantId, tenantId))
+        );
+
+        // If the user is not authorized, throw an exception or handle it as needed
+        if (!isAuthorized) {
+            throw new Exception("Unauthorized access! You are not authorized to view this tenant.");
+        }
+
+        // Fetch the tenant data if authorized
         return tenantService.getTenant(tenantId);
     }
 
