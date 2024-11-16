@@ -2,7 +2,7 @@
 
 A scalable and efficient task management solution designed for multi-tenant environments. This application allows multiple tenants (organizations or user groups) to manage tasks, assign roless, projects, and streamline workflows with a secure and intuitive interface.
 
-## 🚀 Features
+##  Features
 
 - **Transactional Integrity (ACID Compliance)**:
   - Ensures Atomicity, Consistency, Isolation, and Durability across all database operations.
