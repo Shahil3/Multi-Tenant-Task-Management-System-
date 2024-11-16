@@ -2,14 +2,62 @@
 
 A scalable and efficient task management solution designed for multi-tenant environments. This application allows multiple tenants (organizations or user groups) to manage tasks, assign roless, projects, and streamline workflows with a secure and intuitive interface.
 
-## Features
+## 🚀 Features
 
-- **Multi-Tenant Architecture**: Each tenant gets an isolated workspace.
-- **Task Management**: Create, assign, and track projects with ease.
-- **Role-Based Access Control**: Manage user roles and permissions for security.
-- **Caching**: Enhanced performance with Ehcache integration.
-- **Dynamic Views**: Built-in support for Thymeleaf templating for customized UI.
-- **Secure Data**: Implements robust authentication and authorization using Spring Security.
+- **Transactional Integrity (ACID Compliance)**:
+  - Ensures Atomicity, Consistency, Isolation, and Durability across all database operations.
+- **Role-Based Access Control (RBAC)**:
+  - Provides user-specific permissions for secure data access.
+- **Tenant-Specific Isolation**:
+  - Each tenant's data is securely separated to prevent unauthorized cross-tenant access.
+- **Performance Optimization**:
+  - Implements tenant-specific indexing and caching to optimize query response times.
+- **Scalability and Resource Management**:
+  - Dynamically allocates resources to support high-volume concurrent access.
+- **Audit and Compliance**:
+  - Captures tenant-specific logs for monitoring, governance, and security compliance.
+
+---
+
+## 📝 Problem Statement
+
+Modern shared infrastructure systems require efficient solutions for data integrity, secure isolation, and resource optimization. This project addresses these challenges in a multi-tenant environment by using **transaction management**, **data security practices**, and **optimized resource utilization** to provide a robust solution.
+
+---
+
+## Methods Adopted
+
+1. **Data Isolation**:
+   - Introduced a `tenant_id` column in all database tables to enforce tenant-specific data separation.
+2. **Transaction Management**:
+   - Ensured ACID compliance for all CRUD operations.
+3. **Concurrency Control**:
+   - Used optimistic locking to handle simultaneous tenant requests efficiently.
+4. **Indexing**:
+   - Applied tenant-based and selective indexing for frequently queried columns to enhance performance.
+5. **Scalability**:
+   - Leveraged dynamic resource partitioning for seamless scaling.
+6. **Logging and Auditing**:
+   - Implemented tenant-specific logs to monitor user actions and system events for enhanced security.
+
+---
+
+## Key Issues Addressed
+
+1. **Data Isolation**:
+   - Prevent unauthorized cross-tenant data access.
+2. **Transaction Management**:
+   - Maintain ACID properties for consistent and reliable transactions.
+3. **Concurrency Control**:
+   - Efficiently handle high-volume concurrent access.
+4. **Indexing and Optimization**:
+   - Tenant-specific indexing for faster queries and reduced response times.
+5. **Backup and Recovery**:
+   - Implement tenant-level backup and recovery mechanisms.
+6. **Scalability**:
+   - Dynamically allocate resources to handle growing demands.
+7. **Audit and Logging**:
+   - Enable traceability through tenant-specific logs.
 
 ## Technology Stack
 
