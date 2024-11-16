@@ -1,9 +1,3 @@
-# Multi-Tenant-Task-Management-System-
-
-Below is the content you can use for the `README.md` file for the **Multi-Tenant Task Management System** project:
-
----
-
 # Multi-Tenant Task Management System
 
 A scalable and efficient task management solution designed for multi-tenant environments. This application allows multiple tenants (organizations or user groups) to manage tasks, assign roles, and streamline workflows with a secure and intuitive interface.
