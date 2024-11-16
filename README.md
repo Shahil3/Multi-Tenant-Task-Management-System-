@@ -1,11 +1,11 @@
 # Multi-Tenant Task Management System
 
-A scalable and efficient task management solution designed for multi-tenant environments. This application allows multiple tenants (organizations or user groups) to manage tasks, assign roles, and streamline workflows with a secure and intuitive interface.
+A scalable and efficient task management solution designed for multi-tenant environments. This application allows multiple tenants (organizations or user groups) to manage tasks, assign roless, projects, and streamline workflows with a secure and intuitive interface.
 
 ## Features
 
 - **Multi-Tenant Architecture**: Each tenant gets an isolated workspace.
-- **Task Management**: Create, assign, and track tasks with ease.
+- **Task Management**: Create, assign, and track projects with ease.
 - **Role-Based Access Control**: Manage user roles and permissions for security.
 - **Caching**: Enhanced performance with Ehcache integration.
 - **Dynamic Views**: Built-in support for Thymeleaf templating for customized UI.
